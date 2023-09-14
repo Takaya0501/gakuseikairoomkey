@@ -1,15 +1,30 @@
-'use client';
 // pages/index.js
-import React from 'react';
-import ButtonToggle from '../components/ButtonToggle';
+"use client"
 
+import React, { useState, useEffect } from 'react';
+import { getButtonState } from './api/button'; // button.js をインポート
 
-const Home = ({ isOpen }) => {
+const Home = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const fetchButtonState = async () => {
+    const buttonState = await getButtonState(); // ボタンの状態を取得
+    if (buttonState) {
+      setIsOpen(buttonState.isOpen);
+    }
+  };
+
+  // ... 他のコード
+
+  useEffect(() => {
+    fetchButtonState();
+  }, []);
+
   return (
     <div>
       <h1>ボタンの状態</h1>
-      {/* <p>{isOpen ? '空いているよ' : '閉まっているよ'}</p> */}
-      <ButtonToggle />
+      <button onClick={getButtonState}>ボタンを押す</button>
+      <p>{isOpen ? '空いているよ' : '閉まっているよ'}</p>
     </div>
   );
 };
