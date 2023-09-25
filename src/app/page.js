@@ -1,32 +1,52 @@
 // pages/index.js
 "use client"
+// pages/index.js
 
 import React, { useState, useEffect } from 'react';
-import { getButtonState } from './api/button'; // button.js をインポート
+import Button from '../components/Button';
 
-const Home = () => {
+export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
 
-  const fetchButtonState = async () => {
-    const buttonState = await getButtonState(); // ボタンの状態を取得
-    if (buttonState) {
-      setIsOpen(buttonState.isOpen);
-    }
-  };
-
-  // ... 他のコード
-
   useEffect(() => {
+    const fetchButtonState = async () => {
+      try {
+        const response = await fetch('/api/button?id=10000');
+        const data = await response.json();
+        setIsOpen(data.isOpen);
+      } catch (error) {
+        console.error('ボタンの状態の取得エラー', error);
+      }
+    };
+
     fetchButtonState();
   }, []);
+
+  const toggleState = async () => {
+    try {
+      const response = await fetch('/api/button', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json' // JSON形式のデータのヘッダー
+        },
+        body: JSON.stringify({
+          'id': 10000,
+          'isOpen': !isOpen,
+        })
+      });
+      const data = await response.json();
+      setIsOpen(data.isOpen);
+    } catch (error) {
+      console.error('ボタンの状態の更新エラー', error);
+    }
+  };
 
   return (
     <div>
       <h1>ボタンの状態</h1>
-      <button onClick={getButtonState}>ボタンを押す</button>
+      <Button isOpen={isOpen} onClick={toggleState} />
       <p>{isOpen ? '空いているよ' : '閉まっているよ'}</p>
     </div>
   );
-};
+}
 
-export default Home;
